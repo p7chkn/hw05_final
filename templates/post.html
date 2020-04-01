@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Запись {{ author.username }}{% endblock %}
+
+{% block profile %}
+<main role="main" class="container">
+    <div class="row">
+            <div class="col-md-3 mb-3 mt-1">
+                    <div class="card">
+                            <div class="card-body">
+                                    <div class="h2">
+                                        
+                                        {{author.get_full_name}}
+                                    </div>
+                                    <div class="h3 text-muted">
+                                        
+                                         @{{ author.username }}
+                                    </div>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        {% if user.is_authenticated %}
+                                        {% if following %}
+                                        <a class="btn btn-lg btn-light" 
+                                                href="{% url 'profile_unfollow' author.username %}" role="button">                                                                                          
+                                                Отписаться 
+                                                
+                                        </a> 
+                                        {% else %}
+                                        {% if user != author %}  
+                                        <a class="btn btn-lg btn-primary" 
+                                                href="{% url 'profile_follow' author.username %}" role="button">
+                                                                                            
+                                                Подписаться 
+                                                
+                                        </a>
+                                        {% endif %} 
+                                        {% endif %}
+                                        {% endif %}
+                                    </li>
+                                    <li class="list-group-item">
+                                            <div class="h6 text-muted">
+                                               
+                                                Записей: {{quantity}}
+                                            </div>
+                                    </li>
+                            </ul>
+                    </div>
+            </div>
+{% endblock profile %}
+{% block content %}
+
+            <div class="col-md-9">                
+
+             {% include "post_display.html" %}            
+             {% include "comment.html" %}
+{% block footer %} 
+{% endblock footer %}
+     </div>
+    </div>
+</main>
+{% endblock content%}

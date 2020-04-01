@@ -1,9 +1,12 @@
 .git/*
 env/
 venv/
-
+sent_emails/
+.vscode/
 __pycache__/
 *.py[cod]
+
+media/
 
 .idea
 .DS_Store
