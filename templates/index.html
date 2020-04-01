@@ -6,7 +6,7 @@
     {% include "menu.html" with index=True %}
    
     <h1>Последние обновления на сайте</h1>
-    {% cache 20 index_page request.user.username %}
+    {% cache 20 index_page request.user.username page %}
     {% for post in page %}
     {% include "post_display.html" %}
     {% endfor %}
