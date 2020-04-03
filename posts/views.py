@@ -34,10 +34,9 @@ def new_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST or None, files=request.FILES or None)
         if form.is_valid():
-            Post.objects.create(text=form.cleaned_data['text'],
-                                group=form.cleaned_data['group'],
-                                image=form.cleaned_data['image'],
-                                author=request.user)
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
             return redirect('index')
         return render(request, 'new_post.html', {'form': form})
     form = PostForm()
@@ -56,11 +55,8 @@ def profile(request, username):
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     posts = paginator.get_page(page_number)
-    if request.user.is_authenticated:
-        following = True if Follow.objects.filter(user=request.user,
-                                                  author=author) else False
-    else:
-        following = False
+    following = request.user.is_authenticated and Follow.objects.filter(
+        user=request.user,  author=author).exists()
     quantity = Post.objects.filter(author=author).count()
 
     return render(request, 'profile.html', {'posts': posts,
@@ -77,11 +73,8 @@ def post_view(request, username, post_id):
     form = CommentForm()
     comments = Comment.objects.filter(post=post).order_by('-created').all()
     comments_count = comments.count()
-    if request.user.is_authenticated:
-        following = True if Follow.objects.filter(user=request.user,
-                                                  author=author) else False
-    else:
-        following = False
+    following = request.user.is_authenticated and Follow.objects.filter(
+        user=request.user,  author=author).exists()
     return render(request, 'post.html', {'post': post,
                                          'author': author,
                                          'form': form,
@@ -99,10 +92,7 @@ def post_edit(request, username, post_id):
                     instance=edited_post)
     if request.method == 'POST':
         if form.is_valid():
-            edited_post.text = form.cleaned_data['text']
-            edited_post.group = form.cleaned_data['group']
-            edited_post.image = form.cleaned_data['image'] or None
-            edited_post.save()
+            form.save()
             return redirect('post', username=username, post_id=post_id)
         return render(request, 'new_post.html', {'form': form})
     return render(request, 'new_post.html', {'form': form,
@@ -123,9 +113,10 @@ def add_comment(request, username, post_id):
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
-            Comment.objects.create(text=form.cleaned_data['text'],
-                                   post=post,
-                                   author=request.user)
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
             return redirect('post', username=username, post_id=post_id)
     return redirect('post', username=username, post_id=post_id)
 
@@ -149,17 +140,16 @@ def profile_follow(request, username):
     author = User.objects.get(username=username)
     if author == request.user:
         return redirect('profile', username=username)
-    following = True if Follow.objects.filter(user=request.user,
-                                              author=author) else False
-    if following:
-        return redirect('profile', username=username)
-    Follow.objects.create(user=request.user, author=author)
+    following = Follow.objects.filter(user=request.user,
+                                      author=author).exists()
+    if not following:
+        Follow.objects.create(user=request.user, author=author)
     return redirect('profile', username=username)
 
 
 @login_required
 def profile_unfollow(request, username):
-    author = User.objects.get(username=username)
+    author = get_object_or_404(User, username=username)
     follow = Follow.objects.get(user=request.user, author=author)
     follow.delete()
     return redirect('profile', username=username)

@@ -49,6 +49,13 @@ class PostTest(TestCase):
         test_post = 'Test auth new post!'
         self.client.post(reverse('new_post'), {'text': test_post})
         cache.clear()
+        """
+        После введени кэширования на странице index, некоторые тесты завалились.
+        В текущей итерации тестотв отчистка кэша необходима только в test_post_edit.
+        Так как у нас меняются посты и проверяется поменялись ли они на index, если кэш не отчистить,
+        то будет ошибка в тестах.
+        В остальных местах, я очищал кэш просто перед обращением к index. Это превентивная мера, возможно, она слишком избычтона.
+        """
         responce = self.client.get(reverse('index'))
         self.assertContains(responce, test_post)
 
@@ -96,7 +103,8 @@ class PostTest(TestCase):
         responce = self.client.get(reverse('index'))
         self.assertContains(responce, self.post)
         self.assertContains(responce, self.group_post, status_code=200)
-        responce = self.client.get(reverse('profile', args=['yandex']))
+        responce = self.client.get(reverse('profile',
+                                           args=[self.user.username]))
         self.assertContains(responce, self.post)
         self.assertContains(responce, self.group_post)
         responce = self.client.get(reverse('group_list',
