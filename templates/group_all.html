@@ -4,7 +4,7 @@
    
     
     {% for group in groups %}
-    <h4>Группа: <a href="/group/{{ group.slug }}">{{ group.title }}</a></h4>
+    <h4><a href="/group/{{ group.slug }}">#{{ group.title }}</a></h4>
     {% endfor %}
 
 {% endblock %}

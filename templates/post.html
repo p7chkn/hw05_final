@@ -17,8 +17,11 @@
                                     </div>
                             </div>
                             <ul class="list-group list-group-flush">
+                                   {% if user.is_authenticated %}
+                                   {% if user != author %} 
                                     <li class="list-group-item">
-                                        {% if user.is_authenticated %}
+                                        
+                                        
                                         {% if following %}
                                         <a class="btn btn-lg btn-light" 
                                                 href="{% url 'profile_unfollow' author.username %}" role="button">                                                                                          
@@ -26,16 +29,22 @@
                                                 
                                         </a> 
                                         {% else %}
-                                        {% if user != author %}  
+                                         
                                         <a class="btn btn-lg btn-primary" 
                                                 href="{% url 'profile_follow' author.username %}" role="button">
                                                                                             
                                                 Подписаться 
                                                 
                                         </a>
-                                        {% endif %} 
-                                        {% endif %}
-                                        {% endif %}
+                                        {% endif %}                                         
+                                    </li>
+                                    {% endif %}
+                                    {% endif %}
+                                    <li class="list-group-item">
+                                        <div class="h6 text-muted">
+                                        Подписчиков: {{ author.follower.count }} <br />
+                                        Подписан: {{ author.following.count }}
+                                        </div>
                                     </li>
                                     <li class="list-group-item">
                                             <div class="h6 text-muted">

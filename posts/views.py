@@ -11,8 +11,9 @@ def index(request):
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-
+    def_index = True
     return render(request, 'index.html', {'page': page,
+                                          'def_index': def_index,
                                           'paginator': paginator})
 
 
@@ -130,8 +131,10 @@ def follow_index(request):
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
+    follow_index = True
 
     return render(request, 'follow_index.html', {'page': page,
+                                                 'follow_index': follow_index,
                                                  'paginator': paginator})
 
 

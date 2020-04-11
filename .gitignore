@@ -7,6 +7,12 @@ __pycache__/
 *.py[cod]
 
 media/
+posts/migrations/
+
+
+mysite_nginx.conf
+uwsgi_params
+yatube_nginx.conf
 
 .idea
 .DS_Store
